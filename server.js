@@ -4,13 +4,72 @@ const bcrypt = require("bcryptjs");
 const speakeasy = require("speakeasy");
 const QRCode = require("qrcode");
 const session = require("express-session");
+const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
 const app = express();
 const PORT = 3000;
 const ALLOWED_ROLES = ["admin", "doctor", "nurse"];
 
-const users = [];
+const db = new sqlite3.Database(path.join(__dirname, "hospital_auth.db"));
+
+function initDatabase() {
+  db.serialize(() => {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        staff_id TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL,
+        secret TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  });
+}
+
+function getUserByEmail(email) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT id, staff_id, name, email, password, role, secret FROM users WHERE email = ?",
+      [email],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(row || null);
+      }
+    );
+  });
+}
+
+function getUserByStaffId(staffId) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT id, staff_id, name, email, password, role, secret FROM users WHERE staff_id = ?",
+      [staffId],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(row || null);
+      }
+    );
+  });
+}
+
+function createUser({ staffId, name, email, password, role, secret }) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO users (staff_id, name, email, password, role, secret) VALUES (?, ?, ?, ?, ?, ?)",
+      [staffId, name, email, password, role, secret],
+      function (err) {
+        if (err) return reject(err);
+        resolve(this.lastID);
+      }
+    );
+  });
+}
+
+initDatabase();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -65,32 +124,36 @@ app.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Invalid role selected." });
   }
 
-  const existingUser = users.find(
-    (user) => user.email === email || user.staffId === staffId
-  );
+  try {
+    const existingByEmail = await getUserByEmail(email);
+    const existingByStaffId = await getUserByStaffId(staffId);
 
-  if (existingUser) {
-    return res.status(409).json({ message: "User already exists." });
+    if (existingByEmail || existingByStaffId) {
+      return res.status(409).json({ message: "User already exists." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const secret = speakeasy.generateSecret({ name: `CityCare Hospital:${email}` });
+
+    await createUser({
+      staffId,
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      secret: secret.base32
+    });
+
+    const qrCode = await QRCode.toDataURL(secret.otpauth_url);
+
+    return res.status(201).json({
+      message: "Registration successful. Scan the QR code to complete 2FA setup.",
+      qrCode
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return res.status(500).json({ message: "Server error during registration." });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const secret = speakeasy.generateSecret({ name: `CityCare Hospital:${email}` });
-
-  users.push({
-    staffId,
-    name,
-    email,
-    password: hashedPassword,
-    role,
-    secret: secret.base32
-  });
-
-  const qrCode = await QRCode.toDataURL(secret.otpauth_url);
-
-  return res.status(201).json({
-    message: "Registration successful. Scan the QR code to complete 2FA setup.",
-    qrCode
-  });
 });
 
 app.post("/login", async (req, res) => {
@@ -100,61 +163,71 @@ app.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Email and password are required." });
   }
 
-  const user = users.find((currentUser) => currentUser.email === email);
+  try {
+    const user = await getUserByEmail(email);
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found." });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid password." });
+    }
+
+    req.session.tempUser = {
+      email: user.email,
+      name: user.name,
+      staffId: user.staff_id,
+      role: user.role
+    };
+
+    return res.json({
+      message: "Password verified. Please enter your 2FA code.",
+      email: user.email
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Server error during login." });
   }
-
-  const passwordMatch = await bcrypt.compare(password, user.password);
-
-  if (!passwordMatch) {
-    return res.status(401).json({ message: "Invalid password." });
-  }
-
-  req.session.tempUser = {
-    email: user.email,
-    name: user.name,
-    staffId: user.staffId,
-    role: user.role
-  };
-
-  return res.json({
-    message: "Password verified. Please enter your 2FA code.",
-    email: user.email
-  });
 });
 
-app.post("/verify-otp", (req, res) => {
+app.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
     return res.status(400).json({ message: "OTP and email are required." });
   }
 
-  const user = users.find((currentUser) => currentUser.email === email);
+  try {
+    const user = await getUserByEmail(email);
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found." });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const verified = speakeasy.totp.verify({
+      secret: user.secret,
+      encoding: "base32",
+      token: otp
+    });
+
+    if (!verified) {
+      return res.status(401).json({ message: "Invalid 2FA code." });
+    }
+
+    req.session.user = req.session.tempUser;
+    delete req.session.tempUser;
+
+    return res.json({
+      message: "Login successful.",
+      user: req.session.user
+    });
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    return res.status(500).json({ message: "Server error during OTP verification." });
   }
-
-  const verified = speakeasy.totp.verify({
-    secret: user.secret,
-    encoding: "base32",
-    token: otp
-  });
-
-  if (!verified) {
-    return res.status(401).json({ message: "Invalid 2FA code." });
-  }
-
-  req.session.user = req.session.tempUser;
-  delete req.session.tempUser;
-
-  return res.json({
-    message: "Login successful.",
-    user: req.session.user
-  });
 });
 
 app.get("/api/me", requireAuth, (req, res) => {
