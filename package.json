@@ -1,0 +1,17 @@
+{
+  "name": "hospital-auth-system",
+  "version": "1.0.0",
+  "description": "Hospital staff authentication system with 2FA and role-based access",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "express-session": "^1.2.0",
+    "qrcode": "^1.5.3",
+    "speakeasy": "^2.0.0"
+  }
+}

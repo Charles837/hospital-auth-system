@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon">+</div>
+          <div>
+            <h2>CityCare</h2>
+            <p>Admin Portal</p>
+          </div>
+        </div>
+
+        <nav>
+          <a href="#">Overview</a>
+          <a href="#">Staff Management</a>
+          <a href="#">Patient Records</a>
+          <a href="#">Audit Logs</a>
+        </nav>
+
+        <button id="logoutBtn" class="logout-btn" type="button">Log Out</button>
+      </aside>
+
+      <main class="content-area">
+        <header class="topbar">
+          <div>
+            <p class="label">Hospital administration</p>
+            <h1>Admin Dashboard</h1>
+          </div>
+          <div class="user-pill" id="userInfo">Loading...</div>
+        </header>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <span>Total Staff</span>
+            <strong>148</strong>
+          </div>
+          <div class="stat-card">
+            <span>Active Doctors</span>
+            <strong>46</strong>
+          </div>
+          <div class="stat-card">
+            <span>Patients Today</span>
+            <strong>214</strong>
+          </div>
+          <div class="stat-card">
+            <span>Reports Filed</span>
+            <strong>27</strong>
+          </div>
+        </section>
+
+        <section class="panel-grid">
+          <div class="panel-card">
+            <h3>System Status</h3>
+            <ul>
+              <li>Electronic Medical Records: Online</li>
+              <li>Pharmacy System: Online</li>
+              <li>Security Center: Monitoring</li>
+            </ul>
+          </div>
+
+          <div class="panel-card">
+            <h3>Access Summary</h3>
+            <ul>
+              <li>Admins: 7</li>
+              <li>Doctors: 46</li>
+              <li>Nurses: 95</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

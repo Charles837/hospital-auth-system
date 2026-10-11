@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nurse Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon">+</div>
+          <div>
+            <h2>CityCare</h2>
+            <p>Nurse Portal</p>
+          </div>
+        </div>
+
+        <nav>
+          <a href="#">Ward Overview</a>
+          <a href="#">Patient Check-ins</a>
+          <a href="#">Medication</a>
+          <a href="#">Alerts</a>
+        </nav>
+
+        <button id="logoutBtn" class="logout-btn" type="button">Log Out</button>
+      </aside>
+
+      <main class="content-area">
+        <header class="topbar">
+          <div>
+            <p class="label">Nursing operations</p>
+            <h1>Nurse Dashboard</h1>
+          </div>
+          <div class="user-pill" id="userInfo">Loading...</div>
+        </header>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <span>Assigned Patients</span>
+            <strong>18</strong>
+          </div>
+          <div class="stat-card">
+            <span>Vitals Due</span>
+            <strong>7</strong>
+          </div>
+          <div class="stat-card">
+            <span>Medication Tasks</span>
+            <strong>14</strong>
+          </div>
+          <div class="stat-card">
+            <span>Alerts</span>
+            <strong>3</strong>
+          </div>
+        </section>
+
+        <section class="panel-grid">
+          <div class="panel-card">
+            <h3>Ward Status</h3>
+            <ul>
+              <li>Ward A: Stable</li>
+              <li>Ward B: 2 patients pending review</li>
+              <li>Pharmacy: Delivery at 14:30</li>
+            </ul>
+          </div>
+
+          <div class="panel-card">
+            <h3>Care Tasks</h3>
+            <ul>
+              <li>Monitor post-op recovery</li>
+              <li>Update patient observations</li>
+              <li>Verify medication schedules</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

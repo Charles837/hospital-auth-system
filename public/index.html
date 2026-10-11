@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CityCare Hospital | Secure Access</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="left-panel">
+        <div class="brand">
+          <div class="brand-mark">+</div>
+          <div>
+            <h1>CityCare Hospital</h1>
+            <p>Secure Staff Access Portal</p>
+          </div>
+        </div>
+
+        <div class="badge">Trusted healthcare access</div>
+
+        <h2>Protected clinical systems</h2>
+        <p>
+          Secure sign-in for administrators, doctors, and nurses with multi-factor
+          authentication and role-based access control.
+        </p>
+      </div>
+
+      <div class="auth-card">
+        <div class="tabs">
+          <button class="tab active" data-tab="login" type="button">Login</button>
+          <button class="tab" data-tab="register" type="button">Register</button>
+        </div>
+
+        <div id="login-panel" class="panel active">
+          <h3>Welcome back</h3>
+          <form id="loginForm">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="you@citycare.com" required />
+
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password" required />
+
+            <button type="submit">Continue</button>
+          </form>
+
+          <div class="otp-box hidden" id="otpSection">
+            <label for="otpInput">Two-factor code</label>
+            <input type="text" id="otpInput" maxlength="6" placeholder="123456" />
+            <button id="verifyOtpBtn" type="button">Verify Code</button>
+          </div>
+
+          <div id="loginMessage" class="message"></div>
+        </div>
+
+        <div id="register-panel" class="panel">
+          <h3>Create staff account</h3>
+          <form id="registerForm">
+            <label for="staffId">Staff ID</label>
+            <input type="text" id="staffId" placeholder="CC-1042" required />
+
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Dr. Jane Smith" required />
+
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" placeholder="jane@citycare.com" required />
+
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" placeholder="Create password" required />
+
+            <label for="role">Role</label>
+            <select id="role">
+              <option value="admin">Admin</option>
+              <option value="doctor">Doctor</option>
+              <option value="nurse">Nurse</option>
+            </select>
+
+            <button type="submit">Register Account</button>
+          </form>
+
+          <div id="registerMessage" class="message"></div>
+
+          <div id="qrCodeContainer" class="qr-box hidden">
+            <h4>Authenticator QR Code</h4>
+            <img id="qrCodeImage" alt="2FA QR code" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

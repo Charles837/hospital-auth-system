@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon">+</div>
+          <div>
+            <h2>CityCare</h2>
+            <p>Doctor Portal</p>
+          </div>
+        </div>
+
+        <nav>
+          <a href="#">Appointments</a>
+          <a href="#">Patient Charts</a>
+          <a href="#">Lab Results</a>
+          <a href="#">Prescriptions</a>
+        </nav>
+
+        <button id="logoutBtn" class="logout-btn" type="button">Log Out</button>
+      </aside>
+
+      <main class="content-area">
+        <header class="topbar">
+          <div>
+            <p class="label">Clinical operations</p>
+            <h1>Doctor Dashboard</h1>
+          </div>
+          <div class="user-pill" id="userInfo">Loading...</div>
+        </header>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <span>Appointments</span>
+            <strong>12</strong>
+          </div>
+          <div class="stat-card">
+            <span>Patients Today</span>
+            <strong>18</strong>
+          </div>
+          <div class="stat-card">
+            <span>Pending Labs</span>
+            <strong>5</strong>
+          </div>
+          <div class="stat-card">
+            <span>Urgent Cases</span>
+            <strong>2</strong>
+          </div>
+        </section>
+
+        <section class="panel-grid">
+          <div class="panel-card">
+            <h3>Today's Schedule</h3>
+            <ul>
+              <li>08:30 - Cardiology Review</li>
+              <li>10:15 - Follow-up Consultation</li>
+              <li>13:00 - Surgical Assessment</li>
+            </ul>
+          </div>
+
+          <div class="panel-card">
+            <h3>Care Notes</h3>
+            <ul>
+              <li>2 emergency admissions</li>
+              <li>1 prescription renewal pending</li>
+              <li>4 imaging reports reviewed</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>
